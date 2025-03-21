@@ -1,0 +1,13 @@
+../X-CUBE-AI/App/predictive.c:361:9:predictive_configure_activations	2
+../X-CUBE-AI/App/predictive.c:394:9:predictive_configure_weights	2
+../X-CUBE-AI/App/predictive.c:433:9:ai_predictive_get_info	4
+../X-CUBE-AI/App/predictive.c:480:9:ai_predictive_get_report	4
+../X-CUBE-AI/App/predictive.c:527:10:ai_predictive_get_error	1
+../X-CUBE-AI/App/predictive.c:534:10:ai_predictive_create	1
+../X-CUBE-AI/App/predictive.c:545:10:ai_predictive_create_and_init	8
+../X-CUBE-AI/App/predictive.c:580:12:ai_predictive_inputs_get	2
+../X-CUBE-AI/App/predictive.c:591:12:ai_predictive_outputs_get	2
+../X-CUBE-AI/App/predictive.c:602:11:ai_predictive_destroy	1
+../X-CUBE-AI/App/predictive.c:609:9:ai_predictive_init	2
+../X-CUBE-AI/App/predictive.c:626:8:ai_predictive_run	1
+../X-CUBE-AI/App/predictive.c:634:8:ai_predictive_forward	1

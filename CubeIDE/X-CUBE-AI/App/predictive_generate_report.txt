@@ -1,0 +1,180 @@
+ST Edge AI Core v2.0.0-20052
+Created date          : 2025-03-21 09:40:29
+Parameters            : generate --target stm32l4 --name predictive -m /Users/chloelarroze/Downloads/pred_model.h5 --compression low --verbosity 1 --workspace /var/folders/b8/2kssmks15bs1tf84rq45rrxr0000gn/T/mxAI_workspace4256656934958912249759476453029397 --output /Users/chloelarroze/.stm32cubemx/predictive_output
+
+Exec/report summary (generate)
+---------------------------------------------------------------------------------------------------------------------------
+model file         :   /Users/chloelarroze/Downloads/pred_model.h5                                                         
+type               :   keras                                                                                               
+c_name             :   predictive                                                                                          
+compression        :   low                                                                                                 
+options            :   allocate-inputs, allocate-outputs                                                                   
+optimization       :   balanced                                                                                            
+target/series      :   stm32l4                                                                                             
+workspace dir      :   /var/folders/b8/2kssmks15bs1tf84rq45rrxr0000gn/T/mxAI_workspace4256656934958912249759476453029397   
+output dir         :   /Users/chloelarroze/.stm32cubemx/predictive_output                                                  
+model_fmt          :   float                                                                                               
+model_name         :   pred_model                                                                                          
+model_hash         :   0x0c87c7ba0c73df7260424a428dfd2cb2                                                                  
+params #           :   2,662 items (10.40 KiB)                                                                             
+---------------------------------------------------------------------------------------------------------------------------
+input 1/1          :   'input_0', f32(1x5), 20 Bytes, activations                                                          
+output 1/1         :   'dense_2', f32(1x6), 24 Bytes, activations                                                          
+macc               :   2,818                                                                                               
+weights (ro)       :   5,528 B (5.40 KiB) (1 segment) / -5,120(-48.1%) vs float model                                      
+activations (rw)   :   384 B (384 B) (1 segment) *                                                                         
+ram (total)        :   384 B (384 B) = 384 + 0 + 0                                                                         
+---------------------------------------------------------------------------------------------------------------------------
+(*) 'input'/'output' buffers can be used from the activations buffer
+
+Model name - pred_model
+------ ------------------------------- ------------ ------------- ------- --------------- --- ----------------- --------------- ------------------------------- 
+m_id   layer (type,original)           oshape       param/size       macc    connected to   | c_size            c_macc          c_type                          
+------ ------------------------------- ------------ ------------- ------- --------------- --- ----------------- --------------- ------------------------------- 
+0      input_0 (Input, None)           [b:1,c:5]                                            | +1,536(+100.0%)   +448(+100.0%)   Dense_/Nonlinearity_[0, 1]      
+       dense_dense (Dense, Dense)      [b:1,c:64]   384/1,536         384         input_0   | -1,536(-100.0%)   -384(-100.0%)   
+       dense (Nonlinearity, Dense)     [b:1,c:64]                      64     dense_dense   |                   -64(-100.0%)    
+------ ------------------------------- ------------ ------------- ------- --------------- --- ----------------- --------------- ------------------------------- 
+2      dense_1_dense (Dense, Dense)    [b:1,c:32]   2,080/8,320     2,080           dense   | -5,120(-61.5%)    +32(+1.5%)      Dense_/Nonlinearity_[2, 3]      
+       dense_1 (Nonlinearity, Dense)   [b:1,c:32]                      32   dense_1_dense   |                   -32(-100.0%)    
+------ ------------------------------- ------------ ------------- ------- --------------- --- ----------------- --------------- ------------------------------- 
+3      dense_2_dense (Dense, Dense)    [b:1,c:6]    198/792           198         dense_1   |                   +60(+30.3%)     Dense_/Nonlinearity_[o][4, 5]   
+       dense_2 (Nonlinearity, Dense)   [b:1,c:6]                       60   dense_2_dense   |                   -60(-100.0%)    
+------ ------------------------------- ------------ ------------- ------- --------------- --- ----------------- --------------- ------------------------------- 
+model/c-model: macc=2,818/2,818  weights=10,648/5,528 -5,120(-48.1%) activations=--/384 io=--/0
+
+
+
+Generated C-graph summary
+------------------------------------------------------------------------------------------------------------------------
+model name            : pred_model
+c-name                : predictive
+c-node #              : 6
+c-array #             : 13
+activations size      : 384 (1 segment)
+weights size          : 5528 (1 segment)
+macc                  : 2818
+inputs                : ['input_0_output']
+outputs               : ['dense_2_output']
+
+C-Arrays (13)
+------ ----------------------- ----------- ------------------------- ------------------ --------- 
+c_id   name (*_array)          item/size   domain/mem-pool           c-type             comment   
+------ ----------------------- ----------- ------------------------- ------------------ --------- 
+0      dense_1_dense_bias      32/128      weights/weights           const float                  
+1      dense_1_dense_output    32/128      activations/**default**   float                        
+2      dense_1_dense_weights   2048/3072   weights/weights           const lut8_float             
+3      dense_1_output          32/128      activations/**default**   float                        
+4      dense_2_dense_bias      6/24        weights/weights           const float                  
+5      dense_2_dense_output    6/24        activations/**default**   float                        
+6      dense_2_dense_weights   192/768     weights/weights           const float                  
+7      dense_2_output          6/24        activations/**default**   float              /output   
+8      dense_dense_bias        64/256      weights/weights           const float                  
+9      dense_dense_output      64/256      activations/**default**   float                        
+10     dense_dense_weights     320/1280    weights/weights           const float                  
+11     dense_output            64/256      activations/**default**   float                        
+12     input_0_output          5/20        activations/**default**   float              /input    
+------ ----------------------- ----------- ------------------------- ------------------ --------- 
+
+C-Layers (6)
+------ ---------------- ---- --------------- ------ ------ -------------------------- ------------------ 
+c_id   name (*_layer)   id   layer_type      macc   rom    tensors                    shape (array id)   
+------ ---------------- ---- --------------- ------ ------ -------------------------- ------------------ 
+0      dense_dense      0    Dense           384    1536   I: input_0_output          f32(1x5) (12)      
+                                                           W: dense_dense_weights     f32(64x5) (10)     
+                                                           W: dense_dense_bias        f32(64) (8)        
+                                                           O: dense_dense_output      f32(1x64) (9)      
+------ ---------------- ---- --------------- ------ ------ -------------------------- ------------------ 
+1      dense            0    Nonlinearity    64     0      I: dense_dense_output      f32(1x64) (9)      
+                                                           O: dense_output            f32(1x64) (11)     
+------ ---------------- ---- --------------- ------ ------ -------------------------- ------------------ 
+2      dense_1_dense    2    Dense           2080   3200   I: dense_output            f32(1x64) (11)     
+                                                           W: dense_1_dense_weights   c8(32x64) (2)      
+                                                           W: dense_1_dense_bias      f32(32) (0)        
+                                                           O: dense_1_dense_output    f32(1x32) (1)      
+------ ---------------- ---- --------------- ------ ------ -------------------------- ------------------ 
+3      dense_1          2    Nonlinearity    32     0      I: dense_1_dense_output    f32(1x32) (1)      
+                                                           O: dense_1_output          f32(1x32) (3)      
+------ ---------------- ---- --------------- ------ ------ -------------------------- ------------------ 
+4      dense_2_dense    3    Dense           198    792    I: dense_1_output          f32(1x32) (3)      
+                                                           W: dense_2_dense_weights   f32(6x32) (6)      
+                                                           W: dense_2_dense_bias      f32(6) (4)         
+                                                           O: dense_2_dense_output    f32(1x6) (5)       
+------ ---------------- ---- --------------- ------ ------ -------------------------- ------------------ 
+5      dense_2          3    Nonlinearity    60     0      I: dense_2_dense_output    f32(1x6) (5)       
+                                                           O: dense_2_output          f32(1x6) (7)       
+------ ---------------- ---- --------------- ------ ------ -------------------------- ------------------ 
+
+
+
+Number of operations per c-layer
+------- ------ ------------------------ ------- -------------- 
+c_id    m_id   name (type)                  #op           type 
+------- ------ ------------------------ ------- -------------- 
+0       0      dense_dense (Dense)          384   smul_f32_f32 
+1       0      dense (Nonlinearity)          64     op_f32_f32 
+2       2      dense_1_dense (Dense)      2,080    smul_f32_f8 
+3       2      dense_1 (Nonlinearity)        32     op_f32_f32 
+4       3      dense_2_dense (Dense)        198   smul_f32_f32 
+5       3      dense_2 (Nonlinearity)        60     op_f32_f32 
+------- ------ ------------------------ ------- -------------- 
+total                                     2,818 
+
+Number of operation types
+---------------- ------- ----------- 
+operation type         #           % 
+---------------- ------- ----------- 
+smul_f32_f32         582       20.7% 
+op_f32_f32           156        5.5% 
+smul_f32_f8        2,080       73.8% 
+
+Complexity report (model)
+------ --------------- ------------------------- ------------------------- -------- 
+m_id   name            c_macc                    c_rom                     c_id     
+------ --------------- ------------------------- ------------------------- -------- 
+0      input_0         ||||              15.9%   ||||||||          27.8%   [0, 1]   
+2      dense_1_dense   ||||||||||||||||  74.9%   ||||||||||||||||  57.9%   [2, 3]   
+3      dense_2_dense   ||                 9.2%   ||||              14.3%   [4, 5]   
+------ --------------- ------------------------- ------------------------- -------- 
+macc=2,818 weights=5,528 act=384 ram_io=0
+ 
+ Requested memory size by section - "stm32l4" target
+ ------------------------------ ------- -------- ------- ----- 
+ module                            text   rodata    data   bss 
+ ------------------------------ ------- -------- ------- ----- 
+ NetworkRuntime1000_CM4_GCC.a     6,692        0       0     0 
+ predictive.o                       542       48   1,748   148 
+ predictive_data.o                   48       16      88     0 
+ lib (toolchain)*                   614       24       0     0 
+ ------------------------------ ------- -------- ------- ----- 
+ RT total**                       7,896       88   1,836   148 
+ ------------------------------ ------- -------- ------- ----- 
+ weights                              0    5,528       0     0 
+ activations                          0        0       0   384 
+ io                                   0        0       0     0 
+ ------------------------------ ------- -------- ------- ----- 
+ TOTAL                            7,896    5,616   1,836   532 
+ ------------------------------ ------- -------- ------- ----- 
+ *  toolchain objects (libm/libgcc*)
+ ** RT AI runtime objects (kernels+infrastructure)
+  
+  Summary - "stm32l4" target
+  ---------------------------------------------------
+               FLASH (ro)      %*   RAM (rw)       % 
+  ---------------------------------------------------
+  RT total          9,820   64.0%      1,984   83.8% 
+  ---------------------------------------------------
+  TOTAL            15,348              2,368         
+  ---------------------------------------------------
+  *  rt/total
+
+
+Generated files (7)
+----------------------------------------------------------------------------- 
+/Users/chloelarroze/.stm32cubemx/predictive_output/predictive_data_params.h   
+/Users/chloelarroze/.stm32cubemx/predictive_output/predictive_data_params.c   
+/Users/chloelarroze/.stm32cubemx/predictive_output/predictive_data.h          
+/Users/chloelarroze/.stm32cubemx/predictive_output/predictive_data.c          
+/Users/chloelarroze/.stm32cubemx/predictive_output/predictive_config.h        
+/Users/chloelarroze/.stm32cubemx/predictive_output/predictive.h               
+/Users/chloelarroze/.stm32cubemx/predictive_output/predictive.c               

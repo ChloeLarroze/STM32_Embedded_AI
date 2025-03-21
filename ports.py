@@ -1,7 +1,10 @@
 import serial
 import numpy as np
 
-PORT = "/dev/tty.usbmodem144203"
+#environment path 
+#~/doc/projet_ia/.venv/bin/python
+PORT = "/dev/tty.usbmodem141203"
+
 
 def synchronise_UART(serial_port):
     """
@@ -75,8 +78,8 @@ def evaluate_model_on_STM32(iterations, serial_port):
     return accuracy
 
 if __name__ == '__main__':
-    X_test = np.load("/Users/chloelarroze/STM32CubeIDE/workspace_1.16.0/embedded_AI/AI_data_ex1/MNIST_xtest_NN_C2_16_10.npy")
-    Y_test = np.load("/Users/chloelarroze/STM32CubeIDE/workspace_1.16.0/embedded_AI/AI_data_ex1/MNIST_ytest_NN_C2_16_10.npy")
+    X_test = np.load("/Users/chloelarroze/doc/projet_ia/model/X_test_pred.npy")
+    Y_test = np.load("/Users/chloelarroze/doc/projet_ia/model/Y_test_pred.npy")
 
     with serial.Serial(PORT, 115200, timeout=1) as ser:
         print("Synchronising...")

@@ -54,7 +54,18 @@ def read_output_from_STM32(serial_port):
     float_values = [int(out) / 255 for out in output]
     return float_values
 
-def evaluate_model_on_STM32(iterations, serial_port):
+#debug (le collab ne fonctionne donc pas)
+# def read_output_from_STM32(serial_port):
+#     output = serial_port.read(10)
+#     if len(output) < 10:  # Vérifier si on a bien reçu les 10 bytes
+#         print("Erreur : données reçues incomplètes", output)
+#         return [0] * 10  # Retourner une liste de valeurs par défaut
+
+#     float_values = [int(out) / 255 for out in output]
+#     return float_values
+
+
+def evaluate_model_on_STM32(iterations, serial_port, Y_test, X_test):
     """
     Evaluates the accuracy of a machine learning model on an STM32 device.
 
@@ -81,10 +92,14 @@ if __name__ == '__main__':
     X_test = np.load("/Users/chloelarroze/doc/projet_ia/model/X_test_pred.npy")
     Y_test = np.load("/Users/chloelarroze/doc/projet_ia/model/Y_test_pred.npy")
 
+    #print(Y_test.shape)
+    #print(X_test.shape)
+
     with serial.Serial(PORT, 115200, timeout=1) as ser:
         print("Synchronising...")
         synchronise_UART(ser)
         print("Synchronised")
 
         print("Evaluating model on STM32...")
-        error = evaluate_model_on_STM32(100, ser)
+        error = evaluate_model_on_STM32(100, ser, Y_test=Y_test, X_test=X_test)
+

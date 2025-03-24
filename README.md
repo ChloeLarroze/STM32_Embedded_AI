@@ -15,7 +15,7 @@ Le projet couvrira les étapes suivantes :
 
 ## Introduction
 
-De nos jours, avec l'émergence de l'industrie 4.0, le secteur manufacturier connaît une transformation sans précédent grâce aux nouvelles technologies comme l'IoT, l'intelligence artificielle et l'analyse des données.
+Avec l'émergence de l'industrie 4.0, le secteur manufacturier connaît une transformation sans précédent grâce aux nouvelles technologies comme l'IoT, l'intelligence artificielle et l'analyse des données.
 
 <div align="center">
     <img src="./images/figure1.png" alt="Les neuf piliers de l’industrie 4.0" width="400px"/>
@@ -81,7 +81,6 @@ Deux problèmes principaux émergent alors de ce graphe :
 Heureusement, les pannes RNF apparaissent dans un nombre limité d'observations et, par définition, leur caractère aléatoire les rend imprévisibles. Il pourrait donc être pertinent de supprimer ces lignes lors de la préparation finale des données. Cette même logique s'applique aux 9 cas de pannes RNF non étiquetées comme des échecs de machine.
 
 
-
 ## Pipeline global
 
 Toutes les réponses détaillées et les implémentations précises sont disponibles dans le Google Colab (Jupyter Notebook) associé, où l’ensemble des codes et analyses sont regroupés.
@@ -100,6 +99,15 @@ data.drop(index=idx_RNF, inplace=True)
 idx_unknown_failure = data.loc[(data["Machine failure"] == 1) & (data[failure_types].sum(axis=1) == 0)].index
 data.drop(index=idx_unknown_failure, inplace=True)
 ```
+
+Un autre point à prendre en compte est la variation des échelles entre nos différentes variables d’entrée. Les températures sont exprimées en kelvins, le couple en newtons-mètres et la vitesse de rotation en tours par minute, ce qui entraîne des ordres de grandeur très différents. Or, la majorité des algorithmes d’apprentissage  sont sensibles à ces disparités et risquent de privilégier les variables ayant les valeurs les plus élevées, faussant ainsi l’entraînement du modèle. Pour éviter cet effet de dominance et garantir la "stabilité" de nos loss et accuracy, nous normaliserons les données d'entrée, géré par les lignes : 
+
+```python 
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)  # Important : utiliser les mêmes paramètres que le train set
+```
+
 
 ### Entraînement du modèle
 

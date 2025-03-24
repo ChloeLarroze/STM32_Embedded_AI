@@ -87,6 +87,7 @@ Toutes les réponses détaillées et les implémentations précises sont disponi
 
 ### Prétraitement des données
 
+#### Suppression 
 Comme précédemment évoqué, il nous faudra dans un premier temps  nettoyer notre ensemble de données. Les deux problèmes rencontrés ( RNF et problème de Machine Failure) seront gérés dans notre code par les lignes de code suivantes :  
 
 
@@ -100,6 +101,7 @@ idx_unknown_failure = data.loc[(data["Machine failure"] == 1) & (data[failure_ty
 data.drop(index=idx_unknown_failure, inplace=True)
 ```
 
+#### Normalisation
 Un autre point à prendre en compte est la variation des échelles entre nos différentes variables d’entrée. Les températures sont exprimées en kelvins, le couple en newtons-mètres et la vitesse de rotation en tours par minute, ce qui entraîne des ordres de grandeur très différents. Or, la majorité des algorithmes d’apprentissage  sont sensibles à ces disparités et risquent de privilégier les variables ayant les valeurs les plus élevées, faussant ainsi l’entraînement du modèle. Pour éviter cet effet de dominance et garantir la "stabilité" de nos loss et accuracy, nous normaliserons les données d'entrée, géré par les lignes : 
 
 ```python 
@@ -138,29 +140,42 @@ Nous avons privilégié cette méthode plutôt que **l’undersampling**, car el
 </div>
 
 ### Performance du modèle
-
+#### Performances globales
 L'entraînement du modèle a donné les résultats suivants :
 
-- **Performance sur le set TRAIN** : ACCURACY = `0.63`
-- **Performance sur le set TEST** : ACCURACY = `0.77`
+- **Performance sur le set TRAIN** : ACCURACY = `0.97`
+- **Performance sur le set TEST** : ACCURACY = `0.91`
 
 <div align="center">
     <img src="./images/figure7.png" alt="Courbes de loss et d’accuracy" width="600px"/>
     <p><em>Figure 7 : Courbes de loss et d’accuracy</em></p>
 </div>
 
-Malgré l’utilisation de techniques telles que la normalisation, L2 ou dropout pour éviter l’overfitting, ce sont les meilleurs résultats que nous ayons pu obtenir. Cela peut-être dû au fait que sur l’ensemble des  quelques 192.000 échantillons générés par le SMOTE, seuls 38.000 présentent des défauts, ce qui reste déséquilibré. 
+Malgré l’utilisation de techniques telles que la batch normalisation, L2 ou dropout pour éviter l’overfitting, ce sont malheuresement les meilleurs résultats que nous ayons pu obtenir.  
 
+#### Métriques
+Dans le cas de notre modèle, nous avons fait le choix d'une classification multi-classe car nous cherchons à identifier plusieurs types d'erreurs distinctes parmi les échantillons de données. Comme évoqué dans les parties précédentes, chaque instance appartient à une seule classe spécifique (HDF, No error, OSF, PWF, TWF), ce qui justifie l'approche multi-classes plutôt qu'une simple classification binaire.
+
+À cet effet, nous utiliserons plusieurs métrique pour en évaluer la pertinence : 
+- la **précision** : proportion d'instances prédites correctement parmi celles prédites dans une classe donnée (ex : une précision de 0,59 pour HDF signifie que 59 % des prédictions pour HDF étaient correctes);
+- le **rappel** : capacité du modèle à identifier toutes les instances réelles d'une classe spécifique (ex : un rappel de 1,00 pour HDF indique que le modèle a identifié toutes les occurrences "réelles" de cette classe);
+- le **F1-score** : moyenne harmonique de la précision et du rappel;
+- le **support** : nombre d'occurrences réelles de chaque classe dans l'ensemble de test.
+
+Dans nos résultats, la précision élevée pour "No error" (1,00) combinée au rappel de 0,90 suggère que le modèle identifie correctement la majorité des cas sans erreur, mais manque certains. Pour la classe "TWF", par exemple, une précision de 0,03 et un rappel de 0,80 indiquent que, bien que le modèle identifie la plupart des cas réels de TWF, il génère également de nombreuses fausses prédictions pour cette classe.
 
 ## Déploiement sur STM32CubeIDE
-
 todo
 
 ## Utilisation
-
 1. **Entraîner le modèle** en exécutant le notebook sur Google Colab.
 2. **Exporter et convertir le modèle** en format `.h5`.
 3. **Flasher et exécuter sur la carte STM32** via STM32CubeIDE.
+todo
+
+## Pistes d'améliorations
+todo
+
 
 ## Conclusion
 

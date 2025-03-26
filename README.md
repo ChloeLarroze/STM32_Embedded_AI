@@ -27,6 +27,12 @@ Remplacer une machine entière coûte bien plus cher que de changer un simple co
 
 Pour répondre à cette attente, il faudra concevoir un modèle de maintenance prédictive capable d’analyser les données tout en étant optimisé pour une exécution sur un microcontrôleur à ressources limitées. Cela impliquera de trouver un équilibre entre la précision du modèle et sa consommation en mémoire ainsi qu’en puissance de calcul. 
 
+## Utilisation 
+1. **Entraîner le modèle** en exécutant le notebook sur Google Colab.
+2. **Exporter et convertir le modèle** en format `.h5`.
+3. **Flasher et exécuter sur la carte STM32** via STM32CubeIDE.
+4. **Communiquer en UART** avec la carte via l'éxecution du programme python `ports.py` 
+
 ## Installation et Prérequis
 
 Dans le cadre de ce projet, nous avons utilisé un ensemble de bibliothèques et d’outils pour la conception, l'entraînement et le déploiement du modèle de maintenance prédictive sur un microcontrôleur STM32.
@@ -122,21 +128,28 @@ Y = np.where(no_error_condition, 'No Error', Y.idxmax(axis=1))
 Y = pd.get_dummies(Y) #we need to convert it to one-hot
 ```
 
-Ainsi, nos données de sorties contiendront  les labels "No Error" ou bien un des quatre types de pannes. Nous pouvons à présent le ré-équilibrer. En effet, comme nous l’avons observé dans la partie analyse du dataset, ce dernier est fortement déséquilibré, avec les machines rencontrant une panne ne représentant que 3% du dataset. Il faut donc rééquilibrer cela, sans quoi uniquement les machines fonctionnelles seront détectées, comme visible sur la matrice de confusion ci-dessous.
+Ainsi, nos données de sorties contiendront  les labels "No Error" ou bien un des quatre types de pannes. Nous opterons pour l'architecture du DNN suivante : 
+
+<div align="center">
+    <img src="./images/model.png" alt="Proportions des classes avant et après SMOTE" width="200px"/>
+    <p><em>Figure 5 : Schéma DNN</em></p>
+</div>
+
+ Maintenant que l'ensemble de données a été traité et notre modèle créé, nous pouvons le ré-équilibrer. En effet, comme nous l’avons observé dans la partie analyse du dataset, ce dernier est fortement déséquilibré, avec les machines rencontrant une panne ne représentant que 3% du dataset. Il faut donc rééquilibrer cela, sans quoi uniquement les machines fonctionnelles seront détectées, comme visible sur la matrice de confusion ci-dessous.
 
 <div align="center">
     <img src="./images/figure5.png" alt="Proportions des classes avant et après SMOTE" width="300px"/>
-    <p><em>Figure 5 :  Matrice de confusion DNN sans équilibrage</em></p>
+    <p><em>Figure 6 :  Matrice de confusion DNN sans équilibrage</em></p>
 </div>
 
-Pour ce faire, nous avons décidé d'utiliser le **SMOTE** afin de générer des échantillons synthétiques pour les classes minoritaires. Concrètement, le SMOTE sélectionne un échantillon minoritaire, identifie ses k plus proches voisins, et génère un nouvel échantillon en interpolant entre ces points. 
+Pour ce faire,ous avons combiné deux approches : le **SMOTE** et **l’undersampling**. Le SMOTE nous permettra de générer des échantillons synthétiques pour les classes minoritaires. Plsu concrètement, le SMOTE sélectionne un échantillon minoritaire, identifie ses k plus proches voisins, et génère un nouvel échantillon en interpolant entre ces points. 
 
-Nous avons privilégié cette méthode plutôt que **l’undersampling**, car elle préserve l’ensemble des données d’origine tout en équilibrant le dataset, contrairement à l’undersampling qui supprime des observations de la classe majoritaire, ce qui pourrait entraîner une perte d’information et un risque de sous-apprentissage. L’application de SMOTE nous permet donc d’améliorer la capacité du modèle à détecter les défaillances, même rares, sans compromettre la diversité des données.
+En complément, nous avons appliqué l’undersampling à la classe majoritaire afin de réduire son influence et d’éviter un fort déséquilibre dans l’ensemble d’apprentissage. Contrairement à une approche uniquement basée sur de l’undersampling, qui peut entraîner une perte d’information et donc poser un risque de sous-apprentissage, la combinaison des deux méthodes permet d'équilibrer les données tout en préservant leur "diversité" en évitant un biais. 
 
 
 <div align="center">
     <img src="./images/figure6.png" alt="Proportions des classes avant et après SMOTE" width="600px"/>
-    <p><em>Figure 6 : Proportions des classes dans le dataset avant et après SMOTE</em></p>
+    <p><em>Figure 7 : Proportions des classes dans le dataset avant et après SMOTE</em></p>
 </div>
 
 ### Performance du modèle
@@ -148,7 +161,7 @@ L'entraînement du modèle a donné les résultats suivants :
 
 <div align="center">
     <img src="./images/figure7.png" alt="Courbes de loss et d’accuracy" width="600px"/>
-    <p><em>Figure 7 : Courbes de loss et d’accuracy</em></p>
+    <p><em>Figure 8 : Courbes de loss et d’accuracy</em></p>
 </div>
 
 Malgré l’utilisation de techniques telles que la batch normalisation, L2 ou dropout pour éviter l’overfitting, ce sont malheuresement les meilleurs résultats que nous ayons pu obtenir.  
@@ -167,11 +180,6 @@ Dans nos résultats, la précision élevée pour "No error" (1,00) combinée au 
 ## Déploiement sur STM32CubeIDE
 todo
 
-## Utilisation
-1. **Entraîner le modèle** en exécutant le notebook sur Google Colab.
-2. **Exporter et convertir le modèle** en format `.h5`.
-3. **Flasher et exécuter sur la carte STM32** via STM32CubeIDE.
-todo
 
 ## Pistes d'améliorations
 todo

@@ -178,7 +178,24 @@ Dans le cas de notre modèle, nous avons fait le choix d'une classification mult
 Dans nos résultats, la précision élevée pour "No error" (1,00) combinée au rappel de 0,90 suggère que le modèle identifie correctement la majorité des cas sans erreur, mais manque certains. Pour la classe "TWF", par exemple, une précision de 0,03 et un rappel de 0,80 indiquent que, bien que le modèle identifie la plupart des cas réels de TWF, il génère également de nombreuses fausses prédictions pour cette classe.
 
 ## Déploiement sur STM32CubeIDE
-todo
+
+### Présentation de la carte STM32L4R9
+La STM32L4R9 est un microcontrôleur ultra-basse consommation basé sur le cœur Arm Cortex M4. Elle intègre jusqu'à 2 Mo de mémoire Flash et 640 Ko de SRAM, et offre des fonctionnalités telles qu'un contrôleur LCD-TFT et une interface MIPI DSI. Ces caractéristiques la rendent adaptée aux applications nécessitant une interface graphique et une faible consommation d'énergie. 
+
+<div align="center">
+    <img src="./images/carte.png" alt="Courbes de loss et d’accuracy" width="200px"/>
+    <p><em>Figure 9 : Carte STM32L4R9 </em></p>
+</div>
+
+### Analyse du modèle sous X-CUBE-AI 
+
+La première étape à réaliser sous CubeIDE est l'analyse. Nous utiliserons le package STM32CubeMX qui permet l'évaluation, l'optimisation et la conversion de modèles d'IA pour une exécution sur microcontrôleur. Son rôle est de génèrer du code C optimisé pour l'inférence de réseaux neuronaux. L'analyse nous fournit les informations suivantes concernant l'utilisation des ressources :
+
+|                | FLASH (ro) | %    | RAM (rw) | %    |
+|-------------- |-----------|------|---------|------|
+| RT total      | 9,820 B   | 64.5% | 1,984 B | 83.8% |
+| TOTAL        | 15,220 B  |       | 2,368 B |      |
+
 
 
 ## Pistes d'améliorations

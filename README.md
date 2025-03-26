@@ -193,10 +193,21 @@ La première étape à réaliser sous CubeIDE est l'analyse. Nous utiliserons le
 
 |                | FLASH (ro) | %    | RAM (rw) | %    |
 |-------------- |-----------|------|---------|------|
-| RT total      | 9,820 B   | 64.5% | 1,984 B | 83.8% |
-| TOTAL        | 15,220 B  |       | 2,368 B |      |
+| RT total      | 10,392 B   | 64.9% | 2,480 B | 89.6% |
+| TOTAL        | 16,016 B  |       | 2,768 B |      |
 
+### X-cube-ai.c
+C'est dans ce code que nous retrouverons l'implémentation du DNN, avec une communication via UART pour l’acquisition et l’envoi des données.
 
+1. Initialisation du modèle et synchronisation UART : 
+La fonction ai_boostrap() permet de créer et initialiser le réseau de neurones `predictive`. Les données du modèle seront stockées dans les buffers ai_input et ai_output. Le programme procède ensuite à la synchronisation entre l'ordinateur et la carte ( via la fonction synchronize_UART()) et attends un byte de synchronisation (0xAB). En réponse, il envoie un ACK (0xCD).
+
+2. Acquisition et Prétraitement : Avec la méthode acquire_and_process_data(), il attend des données binaires sur l’UART et reconstitue des floats à partir des bytes reçus pour stocker ces valeurs dans le tableau data.
+
+3. Exécution du modèle IA ( avec ai_run())
+ai_predictive_run() effectue une prédiction sur les données reçues, puis envoie en post-traitement et envoi (post_process()) pour récupérer la sortie du modèle.
+
+4. Envoie les valeurs via UART.
 
 ## Pistes d'améliorations
 todo

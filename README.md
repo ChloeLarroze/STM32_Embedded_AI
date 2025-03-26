@@ -202,7 +202,7 @@ C'est dans ce code que nous retrouverons l'implémentation du DNN, avec une comm
 1. Initialisation du modèle et synchronisation UART : 
 La fonction ai_boostrap() permet de créer et initialiser le réseau de neurones `predictive`. Les données du modèle seront stockées dans les buffers ai_input et ai_output. Le programme procède ensuite à la synchronisation entre l'ordinateur et la carte ( via la fonction synchronize_UART()) et attends un byte de synchronisation (0xAB). En réponse, il envoie un ACK (0xCD).
 
-2. Acquisition et Prétraitement : Avec la méthode acquire_and_process_data(), il attend des données binaires sur l’UART et reconstitue des floats à partir des bytes reçus pour stocker ces valeurs dans le tableau data.
+2. Acquisition et Prétraitement : Avec la méthode acquire_and_process_data(), il attend des données binaires sur l’UART et reconstitue des floats à partir des bytes reçus (on a des ) pour stocker ces valeurs dans le tableau data.
 
 3. Exécution du modèle IA ( avec ai_run())
 ai_predictive_run() effectue une prédiction sur les données reçues, puis envoie en post-traitement et envoi (post_process()) pour récupérer la sortie du modèle.

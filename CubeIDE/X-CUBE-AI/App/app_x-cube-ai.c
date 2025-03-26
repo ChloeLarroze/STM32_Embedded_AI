@@ -60,10 +60,10 @@
 /* USER CODE BEGIN includes */
  extern UART_HandleTypeDef huart2;
 
- #define BYTES_IN_FLOATS 8*6//28*28*4
+ #define BYTES_IN_FLOATS 5*4 //5*4
  #define SYNCHRONISATION 0xAB
  #define ACKNOWLEDGE 0xCD
- #define CLASS_NUMBER 6 //10
+ #define CLASS_NUMBER 5
 
  void synchronize_UART(void);
 /* USER CODE END includes */
@@ -189,7 +189,8 @@ int acquire_and_process_data(ai_i8 *data[])
     //
     // 2. Receive data from UART
     //
-    HAL_StatusTypeDef status = HAL_UART_Receive(&huart2, (uint8_t *)tmp, sizeof(tmp), HAL_TIMEOUT);
+    //HAL_Delay(10); //debug : on rajoute du temps pour que l'uart reçoive la commande
+    HAL_StatusTypeDef status = HAL_UART_Receive(&huart2, (uint8_t *)tmp, sizeof(tmp), HAL_MAX_DELAY);
 
     // Check the return status of HAL_UART_Receive
     if (status != HAL_OK)
@@ -223,7 +224,6 @@ int acquire_and_process_data(ai_i8 *data[])
             ((uint8_t *)data)[(i * 4 + k)] = bytes[k];
         }
     }
-
     return (0);
 }
 
@@ -287,7 +287,7 @@ void synchronize_UART(void)
         HAL_UART_Receive(&huart2, (uint8_t *)rx, sizeof(rx), HAL_TIMEOUT);
         if (rx[0] == SYNCHRONISATION)
         {
-            HAL_UART_Transmit(&huart2, (uint8_t *)tx, sizeof(tx), HAL_TIMEOUT);
+            HAL_UART_Transmit(&huart2, (uint8_t *)tx, sizeof(tx), HAL_TIMEOUT );
             is_synced = 1;
         }
     }

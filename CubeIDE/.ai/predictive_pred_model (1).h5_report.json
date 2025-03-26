@@ -1,7 +1,7 @@
 {
     "_allocate_inputs": 4,
     "_allocate_outputs": 4,
-    "cli_parameters": "generate --target stm32l4 --name predictive -m /Users/chloelarroze/Downloads/pred_model.h5 --compression low --verbosity 1 --workspace /var/folders/b8/2kssmks15bs1tf84rq45rrxr0000gn/T/mxAI_workspace7348112200115202173394802191091001 --output /Users/chloelarroze/.stm32cubemx/predictive_output",
+    "cli_parameters": "generate --target stm32l4 --name predictive -m /Users/chloelarroze/Downloads/pred_model (1).h5 --compression low --verbosity 1 --workspace /var/folders/b8/2kssmks15bs1tf84rq45rrxr0000gn/T/mxAI_workspace7373435067494459808386924419728457 --output /Users/chloelarroze/.stm32cubemx/predictive_output",
     "cli_version": {
         "extra": "20052",
         "major": 2,
@@ -11,12 +11,12 @@
     "cli_version_str": "2.0.0-20052",
     "code_size": 0,
     "compression": [],
-    "date_time": "2025-03-26T15:30:53+0100",
+    "date_time": "2025-03-26T16:13:05+0100",
     "error": 0,
     "error_str": [],
     "exec_cmd": "generate",
     "exec_duration": 0.0,
-    "hash": "0x55e6717b88f28da674d54d6ecb5fa163",
+    "hash": "0xb4bd2268990c27eef28c0414d8b43f87",
     "inputs": [
         "input_0"
     ],
@@ -39,7 +39,7 @@
                         5
                     ]
                 },
-                "rom_size": 1536
+                "rom_size": 1152
             },
             "id": 0,
             "inputs": [],
@@ -50,16 +50,16 @@
         {
             "c_id": [],
             "extras": {
-                "n_macc": 384,
-                "n_params": 384,
-                "psize": 1536,
+                "n_macc": 288,
+                "n_params": 288,
+                "psize": 1152,
                 "rom_output": {
-                    "c_size": 256,
+                    "c_size": 192,
                     "fmt": {
                         "format": "float"
                     },
                     "shape": [
-                        64
+                        48
                     ]
                 },
                 "rom_size": 0
@@ -68,34 +68,50 @@
             "inputs": [
                 "input_0"
             ],
-            "name": "dense_dense",
+            "name": "dense_3_dense",
             "original": "Dense",
             "type": "Dense"
         },
         {
             "c_id": [],
             "extras": {
-                "n_macc": 64,
+                "n_macc": 48,
                 "n_params": 0,
                 "psize": 0,
                 "rom_output": {
-                    "c_size": 256,
+                    "c_size": 192,
                     "fmt": {
                         "format": "float"
                     },
                     "shape": [
-                        64
+                        48
                     ]
                 },
                 "rom_size": 0
             },
             "id": 0,
             "inputs": [
-                "dense_dense"
+                "dense_3_dense"
             ],
-            "name": "dense",
+            "name": "dense_3",
             "original": "Dense",
             "type": "Nonlinearity"
+        },
+        {
+            "c_id": [],
+            "extras": {
+                "n_macc": 96,
+                "n_params": 96,
+                "psize": 384,
+                "rom_size": 0
+            },
+            "id": 1,
+            "inputs": [
+                "dense_3"
+            ],
+            "name": "batch_normalization",
+            "original": "BatchNormalization",
+            "type": "ScaleBias"
         },
         {
             "c_id": [
@@ -103,52 +119,68 @@
                 3
             ],
             "extras": {
-                "n_macc": 2080,
-                "n_params": 2080,
-                "psize": 8320,
+                "n_macc": 1176,
+                "n_params": 1176,
+                "psize": 4704,
                 "rom_output": {
-                    "c_size": 128,
+                    "c_size": 96,
                     "fmt": {
                         "format": "float"
                     },
                     "shape": [
-                        32
+                        24
                     ]
                 },
-                "rom_size": 3200
+                "rom_size": 2272
             },
-            "id": 2,
+            "id": 3,
             "inputs": [
-                "dense"
+                "batch_normalization"
             ],
-            "name": "dense_1_dense",
+            "name": "dense_4_dense",
             "original": "Dense",
             "type": "Dense"
         },
         {
             "c_id": [],
             "extras": {
-                "n_macc": 32,
+                "n_macc": 24,
                 "n_params": 0,
                 "psize": 0,
                 "rom_output": {
-                    "c_size": 128,
+                    "c_size": 96,
                     "fmt": {
                         "format": "float"
                     },
                     "shape": [
-                        32
+                        24
                     ]
                 },
                 "rom_size": 0
             },
-            "id": 2,
+            "id": 3,
             "inputs": [
-                "dense_1_dense"
+                "dense_4_dense"
             ],
-            "name": "dense_1",
+            "name": "dense_4",
             "original": "Dense",
             "type": "Nonlinearity"
+        },
+        {
+            "c_id": [],
+            "extras": {
+                "n_macc": 48,
+                "n_params": 48,
+                "psize": 192,
+                "rom_size": 0
+            },
+            "id": 4,
+            "inputs": [
+                "dense_4"
+            ],
+            "name": "batch_normalization_1",
+            "original": "BatchNormalization",
+            "type": "ScaleBias"
         },
         {
             "c_id": [
@@ -156,9 +188,78 @@
                 5
             ],
             "extras": {
-                "n_macc": 165,
-                "n_params": 165,
-                "psize": 660,
+                "n_macc": 600,
+                "n_params": 600,
+                "psize": 2400,
+                "rom_output": {
+                    "c_size": 96,
+                    "fmt": {
+                        "format": "float"
+                    },
+                    "shape": [
+                        24
+                    ]
+                },
+                "rom_size": 1696
+            },
+            "id": 6,
+            "inputs": [
+                "batch_normalization_1"
+            ],
+            "name": "dense_5_dense",
+            "original": "Dense",
+            "type": "Dense"
+        },
+        {
+            "c_id": [],
+            "extras": {
+                "n_macc": 24,
+                "n_params": 0,
+                "psize": 0,
+                "rom_output": {
+                    "c_size": 96,
+                    "fmt": {
+                        "format": "float"
+                    },
+                    "shape": [
+                        24
+                    ]
+                },
+                "rom_size": 0
+            },
+            "id": 6,
+            "inputs": [
+                "dense_5_dense"
+            ],
+            "name": "dense_5",
+            "original": "Dense",
+            "type": "Nonlinearity"
+        },
+        {
+            "c_id": [],
+            "extras": {
+                "n_macc": 48,
+                "n_params": 48,
+                "psize": 192,
+                "rom_size": 0
+            },
+            "id": 7,
+            "inputs": [
+                "dense_5"
+            ],
+            "name": "batch_normalization_2",
+            "original": "BatchNormalization",
+            "type": "ScaleBias"
+        },
+        {
+            "c_id": [
+                6,
+                7
+            ],
+            "extras": {
+                "n_macc": 125,
+                "n_params": 125,
+                "psize": 500,
                 "rom_output": {
                     "c_size": 20,
                     "fmt": {
@@ -168,13 +269,13 @@
                         5
                     ]
                 },
-                "rom_size": 660
+                "rom_size": 500
             },
-            "id": 3,
+            "id": 8,
             "inputs": [
-                "dense_1"
+                "batch_normalization_2"
             ],
-            "name": "dense_2_dense",
+            "name": "dense_6_dense",
             "original": "Dense",
             "type": "Dense"
         },
@@ -195,31 +296,31 @@
                 },
                 "rom_size": 0
             },
-            "id": 3,
+            "id": 8,
             "inputs": [
-                "dense_2_dense"
+                "dense_6_dense"
             ],
-            "name": "dense_2",
+            "name": "dense_6",
             "original": "Dense",
             "type": "Nonlinearity"
         }
     ],
     "model_files": [
-        "/Users/chloelarroze/Downloads/pred_model.h5"
+        "/Users/chloelarroze/Downloads/pred_model (1).h5"
     ],
-    "model_n_params": 2629,
-    "model_name": "pred_model",
-    "model_size": 10516,
+    "model_n_params": 2381,
+    "model_name": "pred_model_1",
+    "model_size": 9524,
     "model_type": "keras",
     "name": "predictive",
     "outputs": [
-        "dense_2"
+        "dense_6"
     ],
     "ram_io_size": [
         0,
         0
     ],
-    "ram_size": 384,
+    "ram_size": 288,
     "report_version": 1.1,
     "rom_cfact": 1.0,
     "rom_heap_inspector": 2048,
@@ -230,15 +331,15 @@
             "name": "input_0"
         }
     ],
-    "rom_n_macc": 2775,
+    "rom_n_macc": 2335,
     "rom_outputs": [
         {
             "c_size": 20,
             "c_type": "float",
-            "name": "dense_2"
+            "name": "dense_6"
         }
     ],
-    "rom_size": 5396,
+    "rom_size": 5620,
     "strategy": "",
     "tools_api_version": "2.0.0-20052",
     "tools_version": "2.0.0-20052",

@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file    predictive_data_params.h
   * @author  AST Embedded Analytics Research Platform
-  * @date    2025-03-21T09:40:28+0100
+  * @date    2025-03-26T16:13:05+0100
   * @brief   AI Tool Automatic Code Generator for Embedded NN computing
   ******************************************************************************
   * Copyright (c) 2025 STMicroelectronics.
@@ -28,18 +28,18 @@
 
 
 #define AI_PREDICTIVE_DATA_ACTIVATIONS_SIZES \
-  { 384, }
-#define AI_PREDICTIVE_DATA_ACTIVATIONS_SIZE     (384)
+  { 288, }
+#define AI_PREDICTIVE_DATA_ACTIVATIONS_SIZE     (288)
 #define AI_PREDICTIVE_DATA_ACTIVATIONS_COUNT    (1)
-#define AI_PREDICTIVE_DATA_ACTIVATION_1_SIZE    (384)
+#define AI_PREDICTIVE_DATA_ACTIVATION_1_SIZE    (288)
 
 
 
 #define AI_PREDICTIVE_DATA_WEIGHTS_SIZES \
-  { 5528, }
-#define AI_PREDICTIVE_DATA_WEIGHTS_SIZE         (5528)
+  { 5620, }
+#define AI_PREDICTIVE_DATA_WEIGHTS_SIZE         (5620)
 #define AI_PREDICTIVE_DATA_WEIGHTS_COUNT        (1)
-#define AI_PREDICTIVE_DATA_WEIGHT_1_SIZE        (5528)
+#define AI_PREDICTIVE_DATA_WEIGHT_1_SIZE        (5620)
 
 
 

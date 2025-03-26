@@ -1,9 +1,8 @@
 import serial
 import numpy as np
+import time
 
-#environment path 
-#~/doc/projet_ia/.venv/bin/python
-PORT = "/dev/tty.usbmodem141203"
+PORT =  "/dev/tty.usbmodem142403" 
 
 
 def synchronise_UART(serial_port):
@@ -16,12 +15,13 @@ def synchronise_UART(serial_port):
     Returns:
         None
     """
-    while True:
+    while (1):
         serial_port.write(b"\xAB")
         ret = serial_port.read(1)
-        if ret == b"\xCD":
+        if (ret == b"\xCD"):
             serial_port.read(1)
             break
+
 
 def send_inputs_to_STM32(inputs, serial_port):
     """
@@ -39,33 +39,29 @@ def send_inputs_to_STM32(inputs, serial_port):
     for x in inputs:
         buffer += x.tobytes()
     serial_port.write(buffer)
+    #serial_port.flush()
+    #time.sleep(0.01)  # Pause de 10ms pour laisser le temps au STM32 de traiter les données
+
 
 def read_output_from_STM32(serial_port):
     """
     Reads 10 bytes from the given serial port and returns a list of float values obtained by dividing each byte by 255.
 
     Args:
-        serial_port: A serial port object.
+    serial_port: A serial port object.
 
     Returns:
-        A list of float values obtained by dividing each byte by 255.
+    A list of float values obtained by dividing each byte by 255.
     """
     output = serial_port.read(10)
-    float_values = [int(out) / 255 for out in output]
+    #print(f"Raw output: {output}")  
+    
+
+    float_values = [int(out)/255 for out in output]
     return float_values
 
-#debug (le collab ne fonctionne donc pas)
-# def read_output_from_STM32(serial_port):
-#     output = serial_port.read(10)
-#     if len(output) < 10:  # Vérifier si on a bien reçu les 10 bytes
-#         print("Erreur : données reçues incomplètes", output)
-#         return [0] * 10  # Retourner une liste de valeurs par défaut
 
-#     float_values = [int(out) / 255 for out in output]
-#     return float_values
-
-
-def evaluate_model_on_STM32(iterations, serial_port, Y_test, X_test):
+def evaluate_model_on_STM32(iterations, serial_port):
     """
     Evaluates the accuracy of a machine learning model on an STM32 device.
 
@@ -81,25 +77,23 @@ def evaluate_model_on_STM32(iterations, serial_port, Y_test, X_test):
         print(f"----- Iteration {i+1} -----")
         send_inputs_to_STM32(X_test[i], serial_port)
         output = read_output_from_STM32(serial_port)
-        if np.argmax(output) == np.argmax(Y_test[i]):
+
+        if (np.argmax(output) == np.argmax(Y_test[i])):
             accuracy += 1 / iterations
         print(f"   Expected output: {Y_test[i]}")
         print(f"   Received output: {output}")
         print(f"----------------------- Accuracy: {accuracy:.2f}\n")
-    return accuracy
+    return 0
+
 
 if __name__ == '__main__':
     X_test = np.load("/Users/chloelarroze/doc/projet_ia/model/X_test_pred.npy")
     Y_test = np.load("/Users/chloelarroze/doc/projet_ia/model/Y_test_pred.npy")
 
-    #print(Y_test.shape)
-    #print(X_test.shape)
-
-    with serial.Serial(PORT, 115200, timeout=1) as ser:
+    with serial.Serial(PORT, 115200, timeout=1) as ser: #on rallonge le timeout ? 
         print("Synchronising...")
         synchronise_UART(ser)
         print("Synchronised")
 
         print("Evaluating model on STM32...")
-        error = evaluate_model_on_STM32(100, ser, Y_test=Y_test, X_test=X_test)
-
+        error = evaluate_model_on_STM32(100, ser)

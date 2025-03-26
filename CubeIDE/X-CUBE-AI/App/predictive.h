@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file    predictive.h
   * @author  AST Embedded Analytics Research Platform
-  * @date    2025-03-21T09:40:28+0100
+  * @date    2025-03-26T16:13:05+0100
   * @brief   AI Tool Automatic Code Generator for Embedded NN computing
   ******************************************************************************
   * @attention
@@ -23,7 +23,7 @@
 
 /******************************************************************************/
 #define AI_PREDICTIVE_MODEL_NAME          "predictive"
-#define AI_PREDICTIVE_ORIGIN_MODEL_NAME   "pred_model"
+#define AI_PREDICTIVE_ORIGIN_MODEL_NAME   "pred_model_1"
 
 /******************************************************************************/
 #define AI_PREDICTIVE_ACTIVATIONS_ALIGNMENT   (4)
@@ -62,12 +62,12 @@ AI_DEPRECATED
   AI_PREDICTIVE_OUT_1_SIZE_BYTES, \
 }
 #define AI_PREDICTIVE_OUT_1_FORMAT      (AI_BUFFER_FORMAT_FLOAT)
-#define AI_PREDICTIVE_OUT_1_CHANNEL     (6)
-#define AI_PREDICTIVE_OUT_1_SIZE        (6)
-#define AI_PREDICTIVE_OUT_1_SIZE_BYTES  (24)
+#define AI_PREDICTIVE_OUT_1_CHANNEL     (5)
+#define AI_PREDICTIVE_OUT_1_SIZE        (5)
+#define AI_PREDICTIVE_OUT_1_SIZE_BYTES  (20)
 
 /******************************************************************************/
-#define AI_PREDICTIVE_N_NODES (6)
+#define AI_PREDICTIVE_N_NODES (8)
 
 
 AI_API_DECLARE_BEGIN

@@ -22,16 +22,11 @@ Avec l'émergence de l'industrie 4.0, le secteur manufacturier connaît une tran
     <p><em>Figure 1 : Les neuf piliers de l’industrie 4.0</em></p>
 </div>
 
-Remplacer une machine entière coûte bien plus cher que de changer un simple composant, d'où l'intérêt d'installer des capteurs pour surveiller leur état en temps réel. En collectant et analysant ces données, les entreprises peuvent optimiser la maintenance, réduire les coûts et éviter les arrêts imprévus. À cet effet, nous nous demanderons 
+De plus, remplacer une machine entière coûte bien plus cher que de changer un simple composant, d'où l'intérêt d'installer des capteurs pour surveiller leur état en temps réel. En collectant et analysant ces données, les entreprises peuvent optimiser la maintenance, réduire les coûts et éviter les arrêts imprévus. À cet effet, nous nous demanderons 
 > Comment concevoir et déployer un modèle de maintenance prédictive efficace sur un microcontrôleur à ressources limitées, tout en garantissant des performances optimales pour la détection des pannes ?
 
 Pour répondre à cette attente, il faudra concevoir un modèle de maintenance prédictive capable d’analyser les données tout en étant optimisé pour une exécution sur un microcontrôleur à ressources limitées. Cela impliquera de trouver un équilibre entre la précision du modèle et sa consommation en mémoire ainsi qu’en puissance de calcul. 
 
-## Utilisation 
-1. **Entraîner le modèle** en exécutant le notebook sur Google Colab.
-2. **Exporter et convertir le modèle** en format `.h5`.
-3. **Flasher et exécuter sur la carte STM32** via STM32CubeIDE.
-4. **Communiquer en UART** avec la carte via l'éxecution du programme python `ports.py` 
 
 ## Installation et Prérequis
 
@@ -48,9 +43,18 @@ Après l'entraînement du modèle sous Google Colab, nous avons converti le mod�
 ### Compatibilité avec TensorFlow
 Nous avons utilisé TensorFlow 2.12, car les versions plus récentes causaient un problème inexpliqué de gestion du batch size lors de la conversion et du déploiement dans STM32Cube.AI.
 
+## QuickStart 
+1. **Entraîner le modèle** en exécutant le notebook sur Google Colab.
+2. **Exporter et convertir le modèle** en format `.h5`.
+3. **Importer les fichiers**`.h5` et `.npy` dans la configuration X-Cube-AI et **Analyser** le modèle.
+4. **Flasher et débugger sur la carte STM32** via STM32CubeIDE.
+5. **Lancer l'éxecution** du main.c
+6. **Ouvrir un terminal** en exécutant la commande 
+```
+python3 ./ports.py
+``` 
 
 ## Dataset utilisé
-
 ### Présentation
 
 Le dataset **AI4I 2020 Predictive Maintenance Dataset** contient 10 000 entrées et est structuré en 14 colonnes, représentant différentes caractéristiques des machines ainsi que des indicateurs de panne. Chaque instance décrit donc l’état de fonctionnement d’une machine et indique si une panne a eu lieu. Ces pannes sont classifiées en 5 types, trouvables dans la dernière colonne du tableau. On retrouve ainsi les entrées suivantes : 
@@ -212,18 +216,14 @@ La fonction ai_boostrap() permet de créer et initialiser le réseau de neurones
 todo
 parler de la config uart (baud rate, 8 bits, parity etc ici) + dire que c'est bien ce que l'on retrouve dans l'ioc
 
-### Debug 
-La première fois que nous compilons et exécutons le code, nous remarquons que la première itération s'effectue bien et nous obtenons les résultats suivants, confirmant que notre modèle fonctionne : 
-```python
-Expected output: [0. 1. 0. 0. 0.]
-Received output: [0.011764705882352941, 0.9215686274509803, 0.11764705882352941, 0.03137254901960784, 0.9882352941176471]
-```
-Cependant, passé cette première itération, le programme s'arrête systématiquement en renvoyant une erreur (aucun résultat n'est renvoyé depuis la carte). En observant le code, nous avons identifié que le code basculait systématiquement dans la fonction d'erreur `ai_log_err` dès la deuxième itération, cette erreur ne peut survenir qu'en cas d'échec de `acquire_and_process_data` (lorsque res = 1) ou de ai_predictive_run. Essayons donc de comprendre les raisons d'une telle erreur en plaçant des breakpoint et en rentrant dans le code en mode pas à pas. 
+## Résultats 
 
-Lors de la première itération, le déroulement est nominal : le breakpoint placé dans `acquire_and_process_data` confirme la bonne réception des données (les variables de debug montrent des buffers in_data et out_data correctement remplis), l'exécution de ai_run se déroule sans anomalie, et dans post_process, et les compteurs i (nombre de classes) et j (bits par classe) s'incrémentent correctement avant que les données ne soient transmises avec succès via HAL_UART_Transmit (retour HAL_OK). 
+<div align="center">
+    <img src="./images/terminal_result.png " alt="Courbes de loss et d’accuracy" width="500px"/>
+    <p><em>Figure 10 : Terminal ports.py </em></p>
+</div>
 
-Cependant, dès la deuxième itération, bien que le programme entre bien dans `acquire_and_process_data`, l'exécution échoue immédiatement sur le HAL_UART_Receive qui retourne systématiquement un HAL_TIMEOUT, indiquant que l'UART ne reçoit plus les données envoyées par le code Python, révélant ainsi une rupture inattendue dans la communication série après le premier échange réussi.
-
+Comme attendu, se script commence par établir une synchronisation avec la carte, puis, une fois la synchronisation établie, le modèle est évalué sur la carte STM32. 
 
 ## Pistes d'améliorations
 todo : niveau métériel : affichage sur écran

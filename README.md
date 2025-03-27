@@ -34,6 +34,8 @@ Dans le cadre de ce projet, nous avons utilisé un ensemble de bibliothèques et
 
 ### Environnement de travail
 
+todo : dire ce que contient le repo 
+
 - **Google Colab (Jupyter Notebook)** : utilisé pour le développement, l'entraînement et l'analyse du modèle en Python.
 - **STM32Cube IDE** : IDE pour le déploiement sur microcontrôleur STM32.
 - **X-CUBE-AI** : bibliothèque fournie par STMicroelectronics permettant de convertir et d’exécuter un modèle de deep learning sur un STM32.
@@ -200,11 +202,21 @@ La première étape à réaliser sous CubeIDE est l'analyse. Nous utiliserons le
 | RT total      | 10,392 B   | 64.9% | 2,480 B | 89.6% |
 | TOTAL        | 16,016 B  |       | 2,768 B |      |
 
+On a donc notre analyse : 
+
+<div align="center">
+    <img src="./images/analyse.png" alt="Courbes de loss et d’accuracy" width="400px"/>
+    <p><em>Figure 10 : Analyse complétée </em></p>
+</div>
+
+
 ### X-cube-ai.c
 C'est dans ce code que nous retrouverons l'implémentation du DNN, avec une communication via UART pour l’acquisition et l’envoi des données. Le main s'occupe d'appeler la fonction `MX_X_Cube_AI`, qui va elle-même appeler l'ensemble des fonctions suivantes : 
 
+todo : faire algorigrammes de comment le truc fonctionne
+
 1. Initialisation du modèle et synchronisation UART : 
-La fonction ai_boostrap() permet de créer et initialiser le réseau de neurones `predictive`. Les données du modèle seront stockées dans les buffers ai_input et ai_output. Le programme procède ensuite à la synchronisation entre l'ordinateur et la carte ( via la fonction synchronize_UART()) et attends un byte de synchronisation (0xAB). En réponse, il envoie un ACK (0xCD).
+La fonction ai_boostrap() permet de créer et initialiser le réseau de neurones `predictive`. Les données du modèle seront stockées dans les buffers ai_input et ai_output. Le programme procède ensuite à la synchronisation entre l'ordinateur et la carte ( via la fonction `synchronize_UART()`) et attends un byte de synchronisation (0xAB). En réponse, il renvoie 0xCD en réponse.
 
 2. Acquisition et Prétraitement : Avec la méthode `acquire_and_process_data()`, il attend des données binaires sur l’UART et reconstitue des floats à partir des bytes reçus pour stocker ces valeurs dans le tableau data.
 
@@ -212,22 +224,49 @@ La fonction ai_boostrap() permet de créer et initialiser le réseau de neurones
 
 4. Envoie les valeurs via UART.
 
-### Code Python `ports.py`
-todo
-parler de la config uart (baud rate, 8 bits, parity etc ici) + dire que c'est bien ce que l'on retrouve dans l'ioc
+
+
+### Communication UART
+#### IOC 
+L'interface de communication entre l’ordinateur et la carte se fait via le protocole UART, dont la configuration dans notre ioc est la suiavante :
+- Baud rate : 115200 bauds
+- Word length : 8 bits
+- Parity : None
+- Stop bits : 1
+- Mode : TX/RX (Transmission et Réception)
+- Flow control : None
+
+Nous nous assurons en plus de son bon paramétrage dans l'ioc : 
+<div align="center">
+    <img src="./images/uart.png " alt="Courbes de loss et d’accuracy" width="200px"/>
+    <p><em>Figure 11 : Configuration UART2 - CubeIDE </em></p>
+</div>
+
+#### Code Python `ports.py`
+
+Le fichier ports.py implémente l’échange de données entre l’ordinateur et la carte via un port série, il utilisera principalement la bibliothèque pyserial pour établir cette communication. Comme évoqué ci-dessus, avant d’envoyer des données, le script s'assure de la bonne la synchronisation avec la STM32 (envoi d'un byte de synchronisation (0xAB) et attente d'une confirmation (0xCD)) avec la fonction `synchronise_uart()`. Une fois la synchronisation établie, les entrées du DNN sont envoyées à la carte. Ces denières sont stockées sous forme de tableaux numpy et converties en bytes pour être transmises. Enfin, après le traitement, la sortie est envoyée sous forme brute et est ensuite décodée en valeurs flottantes, puis traitée. 
 
 ## Résultats 
 
 <div align="center">
     <img src="./images/terminal_result.png " alt="Courbes de loss et d’accuracy" width="500px"/>
-    <p><em>Figure 10 : Terminal ports.py </em></p>
+    <p><em>Figure 12 : Terminal ports.py </em></p>
 </div>
 
-Comme attendu, se script commence par établir une synchronisation avec la carte, puis, une fois la synchronisation établie, le modèle est évalué sur la carte STM32. 
+Comme attendu, ce script commence par établir une synchronisation avec la carte, puis, une fois la synchronisation établie, le modèle est évalué sur la carte STM32. On observe que les sorties retournées par le modèle embarqué diffèrent légèrement des valeurs attendues. On retrouve également notre biais d'entraineemnt avec certaines classes prédominant les autres autres. Ce comportement peut donc être attribué à plusieurs facteurs, notamment la précision des calculs sur la carte embarquée, l'effet de la quantification du modèle, ainsi que d'éventuelles imprécisions liées aux conversions de format
 
-## Pistes d'améliorations
-todo : niveau métériel : affichage sur écran
-niveau logiciel (IA). : voir si toutes les entrées sont pertinentes (par ex esct-ce que la T° a vrmt une quelconque influence (exemple con mais still)) 
+## Pistes d'amélioration
+
+Pour améliorer notre système, nous pourrions explorer les axes suivants :
+
+### Amélioration matérielle
+
+- Affichage des résultats sur écran : Actuellement, les résultats sont affichés uniquement via le terminal. Intégrer un l'écran LCD de carte permettrait d'afficher en temps réel sans avoir besoin d'une connexion avec un PC.
+- Optimisation de la gestion de la mémoire : Vérifier l'utilisation de la mémoire flash et RAM sur la carte pour éviter toute surcharge qui pourrait affecter les performances du modèle.
+
+### Amélioration logicielle
+- Analyse des entrées du modèle : Il serait peut-être pertinent de tester si toutes les features utilisées ont une réelle influence sur les prédictions. 
+- Quantification et optimisation du modèle : Vérifier si une quantification plus fine (ex. en utilisant une précision différente pour les poids) pourrait réduire la perte de performance observée après le déploiement.
 
 ## Conclusion
 

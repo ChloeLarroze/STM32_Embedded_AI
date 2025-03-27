@@ -2,6 +2,7 @@
 title: "Compte rendu de projet - IA embarqué"
 author: "Chloé Larroze, Yann Rosenblum"
 ---
+
 ## Compte rendu de projet - IA embarqué
 
 Ce projet consiste à concevoir, entraîner et déployer un réseau de neurones (DNN) pour la maintenance prédictive, en utilisant le jeu de données AI4I 2020 Predictive Maintenance Dataset. L'objectif final est de déployer le modèle sur un microcontrôleur STM32L4R9 à l'aide de STM32Cube.AI.
@@ -13,6 +14,26 @@ Le projet couvrira les étapes suivantes :
 - Conversion du modèle pour de l’embarqué
 - Intégration pour exécution sur STM32L4R9
 
+Le projet contient les fichiers suivants :
+```
+projet_IA
+├── CubeIDE #fichiers STM32CubeIDE
+│   ├── Core
+│   │   ├── Inc
+│   │   │   ├── main.h
+│   │   ├── Src
+│   │   │   ├── main.c
+│   ├── app-x-cube.c
+│   ├── app-x-cube.h
+├── TP_IA_EMBARQUEE.ipynb #Google Colab
+├── model # Modèle transformé 
+│   ├── modele.h5
+│   ├── X_test.npy
+│   ├── Y_test.npy
+├── README.md #readme
+├── images
+├── ports.py # Programme Python 
+```
 ## Introduction
 
 Avec l'émergence de l'industrie 4.0, le secteur manufacturier connaît une transformation sans précédent grâce aux nouvelles technologies comme l'IoT, l'intelligence artificielle et l'analyse des données.
@@ -33,8 +54,6 @@ Pour répondre à cette attente, il faudra concevoir un modèle de maintenance p
 Dans le cadre de ce projet, nous avons utilisé un ensemble de bibliothèques et d’outils pour la conception, l'entraînement et le déploiement du modèle de maintenance prédictive sur un microcontrôleur STM32.
 
 ### Environnement de travail
-
-todo : dire ce que contient le repo 
 
 - **Google Colab (Jupyter Notebook)** : utilisé pour le développement, l'entraînement et l'analyse du modèle en Python.
 - **STM32Cube IDE** : IDE pour le déploiement sur microcontrôleur STM32.
@@ -213,8 +232,6 @@ On a donc notre analyse :
 ### X-cube-ai.c
 C'est dans ce code que nous retrouverons l'implémentation du DNN, avec une communication via UART pour l’acquisition et l’envoi des données. Le main s'occupe d'appeler la fonction `MX_X_Cube_AI`, qui va elle-même appeler l'ensemble des fonctions suivantes : 
 
-todo : faire algorigrammes de comment le truc fonctionne
-
 1. Initialisation du modèle et synchronisation UART : 
 La fonction ai_boostrap() permet de créer et initialiser le réseau de neurones `predictive`. Les données du modèle seront stockées dans les buffers ai_input et ai_output. Le programme procède ensuite à la synchronisation entre l'ordinateur et la carte ( via la fonction `synchronize_UART()`) et attends un byte de synchronisation (0xAB). En réponse, il renvoie 0xCD en réponse.
 
@@ -223,6 +240,11 @@ La fonction ai_boostrap() permet de créer et initialiser le réseau de neurones
 3. Exécution du modèle IA : (avec les méthodes `ai_run()` et `ai_predictive_run()`) effectue une prédiction sur les données reçues, puis envoie en post-traitement et gère l'envoi (`post_process()`) pour récupérer la sortie du modèle.
 
 4. Envoie les valeurs via UART.
+
+<div align="center">
+    <img src="./images/algorigrams.png" alt="Courbes de loss et d’accuracy" width="400px"/>
+    <p><em>Figure 11 : Algorigramme implémentation STM </em></p>
+</div>
 
 
 
@@ -239,7 +261,7 @@ L'interface de communication entre l’ordinateur et la carte se fait via le pro
 Nous nous assurons en plus de son bon paramétrage dans l'ioc : 
 <div align="center">
     <img src="./images/uart.png " alt="Courbes de loss et d’accuracy" width="200px"/>
-    <p><em>Figure 11 : Configuration UART2 - CubeIDE </em></p>
+    <p><em>Figure 12 : Configuration UART2 - CubeIDE </em></p>
 </div>
 
 #### Code Python `ports.py`
@@ -250,7 +272,7 @@ Le fichier ports.py implémente l’échange de données entre l’ordinateur et
 
 <div align="center">
     <img src="./images/terminal_result.png " alt="Courbes de loss et d’accuracy" width="500px"/>
-    <p><em>Figure 12 : Terminal ports.py </em></p>
+    <p><em>Figure 13 : Terminal ports.py </em></p>
 </div>
 
 Comme attendu, ce script commence par établir une synchronisation avec la carte, puis, une fois la synchronisation établie, le modèle est évalué sur la carte STM32. On observe que les sorties retournées par le modèle embarqué diffèrent légèrement des valeurs attendues. On retrouve également notre biais d'entraineemnt avec certaines classes prédominant les autres autres. Ce comportement peut donc être attribué à plusieurs facteurs, notamment la précision des calculs sur la carte embarquée, l'effet de la quantification du modèle, ainsi que d'éventuelles imprécisions liées aux conversions de format
